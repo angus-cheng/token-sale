@@ -3,12 +3,19 @@
 pragma solidity >=0.5.16;
 
 contract DappToken {
-    string public name = 'DAppToken';
+    string public name = 'DAppToken'; // public gives getter function for each variable
     string public symbol = 'DAPP';
     string public standard = 'DApp Token v1.0';
-    uint256 public totalSupply; // state variable
+    uint256 public totalSupply; // state variables - accessible to entire contract
+
+    event Transfer(
+        address indexed _from, 
+        address indexed _to,
+        uint256 _value
+    );
 
     // mapping: key-value pair
+    // address = user-address in blockchain
     mapping(address => uint256) public balanceOf;
 
     // Constructor - set the total numberof tokens
@@ -18,5 +25,23 @@ contract DappToken {
         totalSupply = initialSupply;
         
         // allocate the initial supply
+    }
+
+    // Transfer function
+    // public because we want people to be able to call this function
+    function transfer(address _to, uint256 _value) public returns (bool success) {
+
+        // Exception thrown if account has less than value
+        // require() ? true (continue) : false (stop & throw error). 
+        require(balanceOf[msg.sender] >= _value);
+
+        // Transfer the balance
+        balanceOf[msg.sender] -= _value;
+        balanceOf[_to] += _value;
+
+        // Transfer Event
+        emit Transfer(msg.sender, _to, _value);
+
+        return true;
     }
 }
