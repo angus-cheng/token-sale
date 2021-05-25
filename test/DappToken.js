@@ -59,4 +59,29 @@ contract('DappToken', function(accounts) {
         });
     });
 
+    it('approves tokens for delegated transfer', function() {
+        return DappToken.deployed().then(function(instance) {
+            tokenInstance = instance;
+            // calls function without writing to blockchain. no logs/receipt
+            return tokenInstance.approve.call(accounts[1], 100);
+        }).then(function(success) {
+            assert.equal(success, true, 'it returns true');
+            return tokenInstance.approve(accounts[1], 100, { from: accounts[0] });
+        }).then(function(receipt) {
+            // checks there is a log event
+            assert.equal(receipt.logs.length, 1, 'triggers one event');
+            // check its an approval event
+            assert.equal(receipt.logs[0].event, 'Approval', 'should be the "Approval" event');
+            // check it has an owner
+            assert.equal(receipt.logs[0].args._owner, accounts[0], 'logs the account the tokens are authorized by');
+            // check it has a spender
+            assert.equal(receipt.logs[0].args._spender, accounts[1], 'logs the account the tokens are authorized to');
+            // check it has a value
+            assert.equal(receipt.logs[0].args._value, 100, 'logs the transfer amount');
+            return tokenInstance.allowance(accounts[0], accounts[1]);
+        }).then(function(allowance) {
+            assert.equal(allowance, 100, 'stores the allowance foe delegated transfer');
+        });
+    });
+
 })

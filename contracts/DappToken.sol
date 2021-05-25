@@ -8,15 +8,24 @@ contract DappToken {
     string public standard = 'DApp Token v1.0';
     uint256 public totalSupply; // state variables - accessible to entire contract
 
+    // loged and accessible to all
     event Transfer(
         address indexed _from, 
         address indexed _to,
         uint256 _value
     );
 
+    // owner account a approves spender b to transfer c tokens
+    event Approval(
+        address indexed _owner,
+        address indexed _spender,
+        uint256 _value
+    );
+
     // mapping: key-value pair
     // address = user-address in blockchain
     mapping(address => uint256) public balanceOf;
+    mapping(address => mapping(address => uint256)) public allowance;
 
     // Constructor - set the total numberof tokens
     // underscores for local variables
@@ -44,4 +53,21 @@ contract DappToken {
 
         return true;
     }
+
+    // approve
+    function approve(address _spender, uint256 _value) public returns (bool success) {
+            // handle allowance
+            allowance[msg.sender][_spender] = _value;
+
+            // handle approve event
+            emit Approval(msg.sender, _spender, _value);
+        
+        return true;
+    }
+
+    // transferFrom
+
+    // allowance
+    
+    // transfer
 }
